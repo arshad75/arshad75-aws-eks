@@ -32,12 +32,12 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: ./your-terraform-module-directory # Update with your module directory
+        working-directory: .
 
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -out=tfplan
-        working-directory: ./your-terraform-module-directory  # Update with your module directory
+        working-directory: .
 
   approval:
     name: 'Manual Approval'
@@ -60,5 +60,5 @@ jobs:
     steps:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: ./your-terraform-module-directory  # Update with your module directory
+        working-directory: .
 
