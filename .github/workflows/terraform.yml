@@ -39,22 +39,25 @@ jobs:
         run: terraform plan -no-color -out=tfplan
         working-directory: ./your-terraform-module-directory  # Update with your module directory
 
-      - name: Upload Plan as Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: tfplan
-          path: ./your-terraform-module-directory/tfplan # Update with your module directory
+  approval:
+    name: 'Manual Approval'
+    runs-on: ubuntu-latest
+    needs: terraform  # This job depends on the terraform job
 
-      # Manual Approval Stage (Optional)
+    steps:
       - name: Approval
         uses: trstringer/manual-approval@v1
         with:
           notify-users: user1, user2  # GitHub usernames to notify
           approvers: user1            # GitHub username required for approval
 
+  apply:
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest
+    needs: approval  # This job depends on the approval job
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'  # Only apply on push to main
+
+    steps:
       - name: Terraform Apply
-        id: apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'  # Only apply on push to main
-        needs: [plan]  # Ensure the plan stage has completed
         run: terraform apply -auto-approve tfplan
         working-directory: ./your-terraform-module-directory  # Update with your module directory
